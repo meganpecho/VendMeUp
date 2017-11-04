@@ -1,0 +1,193 @@
+@font-face {
+    font-family: BebasNeue;
+    src: url('/assets/fonts/bebasneue.otf');
+}
+
+@font-face {
+    font-family: Cream;
+    src: url('/assets/fonts/cream.ttf');
+}
+
+@font-face {
+    font-family: Rakesly_bk;
+    src: url('/assets/fonts/rakesly_bk.ttf');
+}
+
+@font-face {
+    font-family: Rakesly_ltbk;
+    src: url('/assets/fonts/rakesly_lt.ttf');
+}
+
+@font-face {
+    font-family: Coolvetica;
+    src: url('/assets/fonts/coolvetica.ttf');
+}
+
+@font-face {
+    font-family: Babel;
+    src: url('/assets/fonts/BabelSans.ttf');
+}
+
+/*MAIN CSS--------------------------------------------------------------------------------------*/
+
+html {
+    height: 100%;
+    box-sizing: border-box;
+}
+
+body {
+    position: relative;
+    margin: 0;
+    min-height: 100%;
+}
+
+/*NAVBAR SAME FOR ALL PAGES----------------------------------------------------------*/
+.navbar-default {
+    background-color: #2E4057 !important; /*Navbar Color*/
+    padding-top: 15px;
+	position: sticky;
+}
+
+.navbar-nav {
+    background-color: transparent;
+}
+
+/*Attribute styling*/
+.navbar-default .navbar-nav > li > a {
+    color: #fff !important; 
+    background-color: transparent !important;
+    font-family: BebasNeue, Century Gothic, sans-serif;
+    font-size: 28px;
+    letter-spacing: 3px;
+}
+
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus,
+.navbar-default .navbar-nav > li > a:active {
+    color: #cbcbcb !important;
+    
+}
+
+.navbar-collapse .navbar-nav .dropdown .dropdown-menu {
+	background-color: #2E4057 !important;
+}
+
+.navbar-collapse .navbar-nav .dropdown .dropdown-menu > li {
+//    border-bottom: 1px solid lightgrey;
+    padding-top: 6px;
+}
+
+.navbar-collapse .navbar-nav .dropdown .dropdown-menu > li > a {
+    color: #fff !important;
+    font-family: BebasNeue, Century Gothic;
+    font-size: 28px;
+    letter-spacing: 3px;
+    background-color: #2E4057 !important;
+}
+
+.navbar-collapse .navbar-nav .dropdown .dropdown-menu > li > a:hover,
+.navbar-collapse .navbar-nav .dropdown .dropdown-menu > li > a:focus {
+    color: #cbcbcb !important;
+    background-color: #2E4057 !important;
+    
+}
+
+/*ICON BAR for hamburger button*/
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: #fff !important;
+}
+
+.navbar-default .navbar-toggle {
+    border-color: #fff !important;
+		margin-top: -4px;
+}
+
+.navbar-default .navbar-toggle:hover {
+   background-color: #cbcbcb !important;
+	.icon-bar {
+		background-color: #2E4057 !important;
+	}
+}
+
+/*BRAND STYLING*/
+.navbar-default .navbar-header .navbar-brand {
+    color: #fff;
+    font-family: BebasNeue, Century Gothic, sans-serif;
+    font-size: 35px;
+    letter-spacing: 3px;
+    padding-bottom: 10px;
+}
+
+.navbar-default .navbar-header .navbar-brand:hover,
+.navbar-default .navbar-header .navbar-brand:visited {
+    color: #cbcbcb;
+}
+
+/*FOOTER (SAME FOR ALL PAGES)--------------------------------------------------------------------------*/
+
+footer {
+    position: absolute;
+    box-sizing:border-box;
+    background-color: #2E4057;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    width: 100%;
+    height: 40px;
+}
+
+footer p {
+    text-align: right;
+    margin-top: 10px;
+    margin-right: 30px;
+    color: white;
+    font-family: Coolvetica, sans-serif;
+    font-size: 15px;
+}
+
+/*HOME PAGE --------------------------------------------------------------------------*/
+.jumbotron {
+	&.jumbotron-fluid {
+		background-color: rgba(93, 93, 255, 0.7);
+		background-image: url("/assets/images/bean.jpg");
+		background-repeat: no-repeat;
+		background-size: cover;
+		height: 400px;
+		margin-top: 65px;
+	}
+	.container {
+		&.container-fluid {
+			background-color: rgba(255, 255, 255, 0.7);
+			text-align: center;
+			min-height: 300px;
+			h1 { 
+				font-family: BebasNeue, 'Century Gothic', sans-serif;
+				font-size: 90px;
+			}
+			hr.my-4 {
+				border-top: 1px solid #2f2880;
+			}
+			h2 {
+				font-family: Coolvetica, 'Arial', sans-serif;
+				font-size: 48px;
+			}
+		}
+	}
+}
+
+#page_content {
+	padding-bottom: 60px;
+}
+
+
+@media screen and (min-width: 768px) {
+	.jumbotron .container.container-fluid h1 {font-size: 100px}
+}
+
+@media screen and (min-width: 992px) {
+	.jumbotron .container.container-fluid h1 {font-size: 120px}
+}
+
+@media screen and (min-width: 1200px) {
+	.jumbotron .container.container-fluid h1 {font-size: 140px}
+}
