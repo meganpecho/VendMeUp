@@ -1,5 +1,4 @@
 pragma solidity ^0.4.17;
-import "StringUtils";
 
 /* AutoVend
  * contract for physical vending machine 
@@ -9,42 +8,49 @@ import "StringUtils";
 contract AutoVend {
     // automated vending machine contract
     address  _creator;
-    address  _coinStorage;
-    bool     _testMode;
-    bool     _running;
-    uint32   _stgIdx;
-    uint8    STORAGE_MAX = 6;
+    address private _coinStorage;
+    bool    private _testMode;
+    bool    private _running;
+    uint32  private _stgIdx;
+    uint8   STORAGE_MAX = 6;
     
     struct Item {
       string  name;
       uint256 cost;
       uint32  cnt;        
       address supplier;
-      function(address) external resupply; //NOTE: not possible?
+      //function(address) external resupply; //NOTE: not possible?
     }
     
-    struct store { //NOTE: This doesn't corrently allow for a store[] to hold items. See inventory note.
-      Item item; //NOTE: hella poor naming convention
+    struct store { 
+        //NOTE: This doesn't corrently allow for a store[] to hold items. See inventory note.
+      Item item; 
       bool locked;
       bool isActive;
     }
     
-    struct inventory { 
-      // NOTE: item[6] instead of stor
-      store[6] strg; //NOTE: storage is a key word!
-      mapping(address => Item) resupplyAddress;
+    store[6] private stg;
+    mapping(address => uint32) private resupplyAddress;
+    
+    // getters
+    function getResupplier() private returns (address) {
+        
     }
     
-    inventory _inv;
     
     function AutoVend(uint8 itemCnt,
                       uint256 balance,
                       bool testMode) 
-    {
+    public {
       _coinStorage = address(balance);
       _creator  = msg.sender; 
       _testMode = testMode; //made bool, should be bool?
       _stgIdx   = 0;
+      // test storage contract 
+      
+      Item memory a = Item("gum", 3000, 20, 0x000000);
+      // bytes memory __store;
+      // _inv = Inventory(__store);
       // connect the vending machine to le blockchainz
       // this.goLive();
       _running  = true;
@@ -54,9 +60,9 @@ contract AutoVend {
       if (_stgIdx < 4) { // if we are not at max items
         bool success = false;
         for (uint32 i = 0; i < STORAGE_MAX; i++) {
-          if(!_inv.strg[i].isActive) {
-            _inv.strg[i].isActive  = true;
-            _inv.strg[i].item      = _item;
+          if(!stg[i].item.isActive) {
+            stg[i].isActive  = true;
+            stg[i].item      = _item;
             success                = true;
           } 
         }
@@ -72,13 +78,13 @@ contract AutoVend {
     //       but pass them items in use. 
     function _unlock_store(uint32 storeIdx) internal {
       // make api call to physical device
-      _inv.strg[storeIdx].locked = false;
+      stg[storeIdx].locked = false;
       // currently dysfunctional while store struct is dysfunctional. as is checks if item is locked. 
     }
     
     function _lock_store(uint32 storeIdx) internal {
       // make api call to physical device
-      _inv.strg[storeIdx].locked = true;
+      stg[storeIdx].locked = true;
     }
     
     function vend(Item _item, uint32 qty) external payable {
@@ -104,7 +110,7 @@ contract AutoVend {
     
     function find(Item _item) external returns (uint32)  {
         for (uint32 i = 0; i < STORAGE_MAX; i++) {
-            if (StringUtils.equal(_inv.strg[i].item.name, _item.name)) {
+            if (stringsEqual(stg[i].item.name, _item.name)) {
                  return i;
             }
         }
@@ -117,20 +123,24 @@ contract AutoVend {
     function _remove(uint32 storeIdx) internal { 
       //probably should take item, and find its storeIdx
       require(msg.sender == _creator);
-      delete _inv.strg[storeIdx];
-      _inv.activeItems[storeIdx] = false;
+      delete stg[storeIdx];
+      // _inv.activeItems[storeIdx] = false;
       _stgIdx--;
     }
     
     function resupply(Item _item) internal {
       // TODO: call external resupply contract for item (at _item.resupply) 
-      _item.resupply(); //<< Do that  <<
+      //_item.resupply(_item.supplier); //<< Do that  <<
     }
     
     function turnOff() external {
       require(msg.sender == _creator);
       _running = false;
     }
+    // UTILITIES
+    function stringsEqual(string _a, string _b) internal returns (bool) {
+      return keccak256(_a) == keccak256(_b);
+  }
 }
 
 // TODO: move into own file
