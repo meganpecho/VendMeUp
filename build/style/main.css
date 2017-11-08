@@ -16,6 +16,9 @@
 @font-face {
   font-family: Babel;
   src: url("/assets/fonts/BabelSans.ttf"); }
+@font-face {
+  font-family: digital-7;
+  src: url("/assets/fonts/digital-7.ttf"); }
 /*MAIN CSS--------------------------------------------------------------------------------------*/
 html {
   height: 100%;
@@ -26,11 +29,14 @@ body {
   margin: 0;
   min-height: 100%; }
 
+* {
+  box-sizing: border-box; }
+
 /*NAVBAR SAME FOR ALL PAGES----------------------------------------------------------*/
 .navbar-default {
   background-color: #2E4057 !important;
   /*Navbar Color*/
-  padding-top: 15px;
+  margin-top: -4px !important;
   position: sticky; }
 
 .navbar-nav {
@@ -40,7 +46,7 @@ body {
 .navbar-default .navbar-nav > li > a {
   color: #fff !important;
   background-color: transparent !important;
-  font-family: BebasNeue, Century Gothic, sans-serif;
+  font-family: Coolvetica, Century Gothic, sans-serif;
   font-size: 28px;
   letter-spacing: 3px; }
 
@@ -57,7 +63,7 @@ body {
 
 .navbar-collapse .navbar-nav .dropdown .dropdown-menu > li > a {
   color: #fff !important;
-  font-family: BebasNeue, Century Gothic;
+  font-family: Coolvetica, Century Gothic;
   font-size: 28px;
   letter-spacing: 3px;
   background-color: #2E4057 !important; }
@@ -83,7 +89,7 @@ body {
 /*BRAND STYLING*/
 .navbar-default .navbar-header .navbar-brand {
   color: #fff;
-  font-family: BebasNeue, Century Gothic, sans-serif;
+  font-family: Coolvetica, Century Gothic, sans-serif;
   font-size: 35px;
   letter-spacing: 3px;
   padding-bottom: 10px; }
@@ -112,37 +118,185 @@ footer p {
   font-size: 15px; }
 
 /*HOME PAGE --------------------------------------------------------------------------*/
-.jumbotron.jumbotron-fluid {
-  background-color: rgba(93, 93, 255, 0.7);
-  background-image: url("/assets/images/bean.jpg");
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 400px;
-  margin-top: 65px; }
-.jumbotron .container.container-fluid {
-  background-color: rgba(255, 255, 255, 0.7);
-  text-align: center;
-  min-height: 300px; }
-  .jumbotron .container.container-fluid h1 {
-    font-family: BebasNeue, 'Century Gothic', sans-serif;
-    font-size: 90px; }
-  .jumbotron .container.container-fluid hr.my-4 {
-    border-top: 1px solid #2f2880; }
-  .jumbotron .container.container-fluid h2 {
-    font-family: Coolvetica, 'Arial', sans-serif;
-    font-size: 48px; }
-
 #page_content {
-  padding-bottom: 60px; }
+  padding-bottom: 60px;
+  padding-top: 50px; }
 
-@media screen and (min-width: 768px) {
-  .jumbotron .container.container-fluid h1 {
-    font-size: 100px; } }
-@media screen and (min-width: 992px) {
-  .jumbotron .container.container-fluid h1 {
-    font-size: 120px; } }
-@media screen and (min-width: 1200px) {
-  .jumbotron .container.container-fluid h1 {
-    font-size: 140px; } }
+.vending-machine {
+  background-color: #bbb;
+  padding: 30px;
+  border-radius: 10px;
+  min-height: 450px;
+  margin-top: 20px;
+  z-index: 2;
+  margin-left: auto;
+  max-width: 940px;
+  margin-right: auto; }
+
+/*ITEM --------------------------------------------------------------------------*/
+.square {
+  height: 200px;
+  width: 200px;
+  position: relative;
+  box-shadow: 5px 5px 0px #999;
+  margin: 10px;
+  display: inline-block;
+  z-index: 4; }
+  .square:hover, .square:focus {
+    cursor: pointer; }
+  .square.pink {
+    background-color: deeppink; }
+    .square.pink .item {
+      background-color: hotpink; }
+    .square.pink:hover, .square.pink:focus {
+      background-color: #ff47aa; }
+      .square.pink:hover item, .square.pink:focus item {
+        background-color: #ffcfe7; }
+  .square.green {
+    background-color: forestgreen; }
+    .square.green .item {
+      background-color: limegreen; }
+    .square.green:hover, .square.green:focus {
+      background-color: #2cb42c; }
+      .square.green:hover item, .square.green:focus item {
+        background-color: #84e184; }
+  .square.blue {
+    background-color: darkblue; }
+    .square.blue .item {
+      background-color: deepskyblue; }
+    .square.blue:hover, .square.blue:focus {
+      background-color: #0000be; }
+      .square.blue:hover item, .square.blue:focus item {
+        background-color: #66d9ff; }
+  .square.orange {
+    background-color: orangered; }
+    .square.orange .item {
+      background-color: orange; }
+    .square.orange:hover, .square.orange:focus {
+      background-color: #ff6a33; }
+      .square.orange:hover item, .square.orange:focus item {
+        background-color: #ffc966; }
+  .square.purple {
+    background-color: rebeccapurple; }
+    .square.purple .item {
+      background-color: violet; }
+    .square.purple:hover, .square.purple:focus {
+      background-color: #8040bf; }
+      .square.purple:hover item, .square.purple:focus item {
+        background-color: #fadcfa; }
+  .square.yellow {
+    background-color: goldenrod; }
+    .square.yellow .item {
+      background-color: yellow; }
+    .square.yellow:hover, .square.yellow:focus {
+      background-color: #e4b849; }
+      .square.yellow:hover item, .square.yellow:focus item {
+        background-color: #ffff66; }
+  .square .item {
+    position: absolute;
+    height: 180px;
+    width: 180px;
+    top: 10px;
+    left: 10px;
+    text-align: center;
+    z-index: 8; }
+    .square .item h4 {
+      font-family: Coolvetica, Century Gothic, sans-serif;
+      font-size: 32px;
+      color: #000;
+      display: block;
+      margin-bottom: 8px; }
+    .square .item p {
+      display: block;
+      color: #000;
+      font-family: Babel, monospace;
+      font-size: 16px; }
+    .square .item .img-cont {
+      height: 80px;
+      width: 80px;
+      position: absolute;
+      left: 50px;
+      display: block;
+      z-index: 16; }
+      .square .item .img-cont img {
+        height: 100%;
+        width: 100%; }
+    .square .item .clicked {
+      display: none;
+      z-index: 20; }
+      .square .item .clicked .add-btn {
+        min-width: 70px;
+        padding: 5px;
+        font-family: Coolvetica, sans-serif;
+        background-color: transparent;
+        border: 2px solid black;
+        margin-top: 20px;
+        font-size: 16px;
+        z-index: 24;
+        border-radius: 3px; }
+        .square .item .clicked .add-btn:hover {
+          color: white;
+          background-color: #000; }
+
+/* SIDE PANEL --------------------------------------------------------------------------*/
+.sidepanel .toBuy {
+  height: 225px;
+  width: 190px;
+  background-color: #333;
+  float: right;
+  display: block;
+  margin: 0 10px 10px 10px;
+  padding: 10px;
+  z-index: 28;
+  overflow-y: auto;
+  overflow-x: hidden; }
+  .sidepanel .toBuy p {
+    display: inline;
+    color: limegreen;
+    font-family: digital-7, monospace;
+    font-size: 16px; }
+    .sidepanel .toBuy p.title-name {
+      margin-left: 10px; }
+  .sidepanel .toBuy ul.items {
+    list-style: none;
+    padding: 0; }
+    .sidepanel .toBuy ul.items li.anItem {
+      height: 22px; }
+.sidepanel h6.total {
+  font-family: Babel, sans-serif;
+  font-size: 20px;
+  color: #000;
+  text-align: right;
+  margin-right: 10px; }
+.sidepanel .buy-btn, .sidepanel .reset-btn {
+  display: block;
+  float: right;
+  text-align: center;
+  clear: right;
+  border: none;
+  padding: 15px;
+  min-width: 190px;
+  margin: 10px;
+  color: #fff;
+  letter-spacing: 2px;
+  font-family: Coolvetica, sans-serif;
+  font-size: 18px;
+  box-shadow: 5px 5px 1px #999;
+  border-radius: 3px; }
+  .sidepanel .buy-btn:active, .sidepanel .reset-btn:active {
+    position: relative;
+    left: 2px;
+    top: 2px;
+    box-shadow: 3px 3px 1px #999; }
+.sidepanel .buy-btn {
+  background-color: #0038A1;
+  z-index: 32; }
+  .sidepanel .buy-btn:hover {
+    background-color: #0053ee; }
+.sidepanel .reset-btn {
+  background-color: #a10000;
+  z-index: 34; }
+  .sidepanel .reset-btn:hover {
+    background-color: #ee0000; }
 
 /*# sourceMappingURL=main.css.map */

@@ -28,6 +28,11 @@
     src: url('/assets/fonts/BabelSans.ttf');
 }
 
+@font-face {
+	font-family: digital-7;
+	src: url('/assets/fonts/digital-7.ttf');
+}
+
 /*MAIN CSS--------------------------------------------------------------------------------------*/
 
 html {
@@ -41,11 +46,15 @@ body {
     min-height: 100%;
 }
 
+* {
+	box-sizing: border-box;
+}
+
 /*NAVBAR SAME FOR ALL PAGES----------------------------------------------------------*/
 .navbar-default {
     background-color: #2E4057 !important; /*Navbar Color*/
-    padding-top: 15px;
-	position: sticky;
+        margin-top: -4px !important;
+		position: sticky;
 }
 
 .navbar-nav {
@@ -56,7 +65,7 @@ body {
 .navbar-default .navbar-nav > li > a {
     color: #fff !important; 
     background-color: transparent !important;
-    font-family: BebasNeue, Century Gothic, sans-serif;
+    font-family: Coolvetica, Century Gothic, sans-serif;
     font-size: 28px;
     letter-spacing: 3px;
 }
@@ -79,7 +88,7 @@ body {
 
 .navbar-collapse .navbar-nav .dropdown .dropdown-menu > li > a {
     color: #fff !important;
-    font-family: BebasNeue, Century Gothic;
+    font-family: Coolvetica, Century Gothic;
     font-size: 28px;
     letter-spacing: 3px;
     background-color: #2E4057 !important;
@@ -112,7 +121,7 @@ body {
 /*BRAND STYLING*/
 .navbar-default .navbar-header .navbar-brand {
     color: #fff;
-    font-family: BebasNeue, Century Gothic, sans-serif;
+    font-family: Coolvetica, Century Gothic, sans-serif;
     font-size: 35px;
     letter-spacing: 3px;
     padding-bottom: 10px;
@@ -146,48 +155,249 @@ footer p {
 }
 
 /*HOME PAGE --------------------------------------------------------------------------*/
-.jumbotron {
-	&.jumbotron-fluid {
-		background-color: rgba(93, 93, 255, 0.7);
-		background-image: url("/assets/images/bean.jpg");
-		background-repeat: no-repeat;
-		background-size: cover;
-		height: 400px;
-		margin-top: 65px;
+
+
+#page_content {
+	padding-bottom: 60px;
+	padding-top: 50px;
+}
+
+.vending-machine {
+	background-color: #bbb;
+	padding: 30px;
+	border-radius: 10px;
+	min-height: 450px;
+	margin-top: 20px;
+	z-index: 2;
+	margin-left: auto;
+	max-width: 940px;
+	margin-right: auto;
+}
+
+/*ITEM --------------------------------------------------------------------------*/
+.square {
+	height: 200px;
+	width: 200px;
+	position: relative;
+	box-shadow: 5px 5px 0px #999;
+	margin: 10px;
+	display: inline-block;
+	z-index: 4;
+	&:hover, &:focus {
+		cursor: pointer;
 	}
-	.container {
-		&.container-fluid {
-			background-color: rgba(255, 255, 255, 0.7);
-			text-align: center;
-			min-height: 300px;
-			h1 { 
-				font-family: BebasNeue, 'Century Gothic', sans-serif;
-				font-size: 90px;
+	&.pink {
+		background-color: deeppink;
+		.item {
+			background-color: hotpink;
+		}
+		&:hover, &:focus {
+			background-color: lighten(deeppink, 10%);
+			item {
+				background-color: lighten(hotpink, 20%);
 			}
-			hr.my-4 {
-				border-top: 1px solid #2f2880;
+		}	
+	}
+	&.green {
+		background-color: forestgreen;
+		.item {
+			background-color: limegreen;
+		}
+		&:hover, &:focus {
+			background-color: lighten(forestgreen, 10%);
+			item {
+				background-color: lighten(limegreen, 20%);
 			}
-			h2 {
-				font-family: Coolvetica, 'Arial', sans-serif;
-				font-size: 48px;
+		}
+	}
+	&.blue {
+		background-color: darkblue;
+		.item {
+			background-color: deepskyblue;
+		}
+		&:hover, &:focus {
+			background-color: lighten(darkblue, 10%);
+			item {
+				background-color: lighten(deepskyblue, 20%);
+			}
+		}
+	}
+	&.orange {
+		background-color: orangered;
+		.item {
+			background-color: orange;
+		}
+		&:hover, &:focus {
+			background-color: lighten(orangered, 10%);
+			item {
+				background-color: lighten(orange, 20%);
+			}
+		}
+	}
+	&.purple {
+		background-color: rebeccapurple;
+		.item {
+			background-color: violet;
+		}
+		&:hover, &:focus {
+			background-color: lighten(rebeccapurple, 10%);
+			item {
+				background-color: lighten(violet, 20%);
+			}
+		}
+	}
+	&.yellow {
+		background-color: goldenrod;
+		.item {
+			background-color: yellow;
+		}
+		&:hover, &:focus {
+			background-color: lighten(goldenrod, 10%);
+			item {
+				background-color: lighten(yellow, 20%);
+			}
+		}
+	}
+	.item {
+		position: absolute;
+		height: 180px;
+		width: 180px;
+		top: 10px;
+		left: 10px;
+		text-align: center;
+		z-index: 8;
+		h4 {
+			font-family: Coolvetica, Century Gothic, sans-serif;
+			font-size: 32px;
+			color: #000;
+			display: block;
+			margin-bottom: 8px;
+		}
+		p {
+			display: block;
+			color: #000;
+			font-family: Babel, monospace;
+			font-size: 16px;
+		}
+		.img-cont {
+			height: 80px;
+			width: 80px;
+			position: absolute;
+			left: 50px;
+			display: block;
+			z-index: 16;
+			img {
+				height: 100%;
+				width: 100%;
+			}
+		}
+		.clicked {
+			display: none;
+			z-index: 20;
+			.add-btn {
+				min-width: 70px;
+				padding: 5px;
+				font-family: Coolvetica, sans-serif;
+				background-color: transparent;
+				border: 2px solid black;
+				margin-top: 20px;
+				font-size: 16px;
+				z-index: 24;
+				border-radius: 3px;
+				&:hover {
+					color: white;
+    			background-color: #000;
+				}
 			}
 		}
 	}
 }
 
-#page_content {
-	padding-bottom: 60px;
+/* SIDE PANEL --------------------------------------------------------------------------*/
+.sidepanel {	
+	.toBuy {
+		height: 225px;
+    width: 190px;
+    background-color: #333;
+    float: right;
+    display: block;
+    margin: 0 10px 10px 10px;
+    padding: 10px;
+    z-index: 28;
+    overflow-y: auto;
+    overflow-x: hidden;
+		p {
+			display: inline;
+			color: limegreen;
+			font-family: digital-7, monospace;
+			font-size: 16px;
+			&.title-name {
+				margin-left: 10px;
+			}
+		}
+		ul.items {
+			list-style: none;
+			padding: 0;
+			li.anItem {
+				height: 22px;
+			}
+		}
+	}
+	h6.total {
+		font-family: Babel, sans-serif;
+    font-size: 20px;
+    color: #000;
+    text-align: right;
+    margin-right: 10px;
+	}
+	.buy-btn, .reset-btn {
+		display: block;
+    float: right;
+    text-align: center;
+    clear: right;
+    border: none;
+    padding: 15px;
+    min-width: 190px;
+    margin: 10px;
+    color: #fff;
+		letter-spacing: 2px;
+    font-family: Coolvetica, sans-serif;
+    font-size: 18px;
+    box-shadow: 5px 5px 1px #999;
+		border-radius: 3px;
+		&:active {
+			position: relative;
+			left: 2px;
+			top: 2px;
+			box-shadow: 3px 3px 1px #999;
+		}
+	}
+	.buy-btn {
+    background-color: #0038A1;
+		z-index: 32;
+		&:hover {
+			background-color: lighten(#0038A1, 15%);
+		}
+	}
+	.reset-btn {
+		background-color: #a10000;
+		z-index: 34;
+		&:hover {
+			background-color: lighten(#a10000, 15%);
+		}
+	}
+	
 }
 
 
 @media screen and (min-width: 768px) {
-	.jumbotron .container.container-fluid h1 {font-size: 100px}
+
 }
 
 @media screen and (min-width: 992px) {
-	.jumbotron .container.container-fluid h1 {font-size: 120px}
+
 }
 
 @media screen and (min-width: 1200px) {
-	.jumbotron .container.container-fluid h1 {font-size: 140px}
+
 }
