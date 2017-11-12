@@ -1,17 +1,21 @@
-pragma solidity ^0.4.17;
-
-/* AutoVend
+/* vendMeUp
+ * John Pridmore, Artur Oganezov, Megan Pecho
+ * 11/14/17 
+ * CSC299
+ *
+ * AutoVend
  * contract for physical vending machine 
  * _creator   = contract owner
  * _inventory = inventory
  */
+pragma solidity ^0.4.17; 
 contract AutoVend {
     // automated vending machine contract
-    address  _creator;
+    address _creator;
     address private _coinStorage;
     bool    private _testMode;
     bool    private _running;
-    uint32  private _stgIdx;
+    uint32  _stgIdx;
     uint8   STORAGE_MAX = 6;
     
     struct Item {
@@ -19,137 +23,154 @@ contract AutoVend {
       uint256 cost;
       uint32  cnt;        
       address supplier;
-      //function(address) external resupply; //NOTE: not possible?
+      uint32  idx;
     }
-    
+    // store represents physical containers for Items
     struct store { 
-        //NOTE: This doesn't corrently allow for a store[] to hold items. See inventory note.
       Item item; 
       bool locked;
       bool isActive;
     }
-    
     store[6] private stg;
-    mapping(address => uint32) private resupplyAddress;
     
-    // getters
-    function getResupplier() private returns (address) {
-        
+    /* CTOR */
+    function AutoVend(bool testMode) public payable {
+        _creator  = msg.sender; 
+        _testMode = testMode; //made bool, should be bool?
+        _stgIdx   = 0;
+        _running  = true;
+    // test storage contract 
+    //   for(; _stgIdx < STORAGE_MAX; _stgIdx++) {
+    //       stg[_stgIdx].item = Item("", 0, 0, 0x000000, _stgIdx);
+    //   }
     }
     
-    
-    function AutoVend(uint8 itemCnt,
-                      uint256 balance,
-                      bool testMode) 
-    public {
-      _coinStorage = address(balance);
-      _creator  = msg.sender; 
-      _testMode = testMode; //made bool, should be bool?
-      _stgIdx   = 0;
-      // test storage contract 
-      
-      Item memory a = Item("gum", 3000, 20, 0x000000);
-      // bytes memory __store;
-      // _inv = Inventory(__store);
-      // connect the vending machine to le blockchainz
-      // this.goLive();
-      _running  = true;
+    /* addItem */
+    function addItem(uint32 _idx, string _name, uint256 _cost, uint32 _cnt, address _supplier) public {
+        Item memory tmp = Item({name: _name, cost: _cost, cnt: _cnt, supplier: _supplier, idx: _idx});
+        stg[_idx].item = tmp;
     }
     
-    function _addItem(Item _item) internal {
-      if (_stgIdx < 4) { // if we are not at max items
-        bool success = false;
-        for (uint32 i = 0; i < STORAGE_MAX; i++) {
-          if(!stg[i].item.isActive) {
-            stg[i].isActive  = true;
-            stg[i].item      = _item;
-            success                = true;
-          } 
+    /* get Item */
+    function getItem(uint32 itemIdx) external view returns (Item) {
+        return stg[itemIdx].item;
+    }
+    
+    /* change Item */
+    function changeItem(uint32 itemIdx, string _name, uint256 _cost, uint32 _cnt, address _supplier) external {
+        require(msg.sender == stg[itemIdx].item.supplier);
+        /* TODO: change item logic */
+        addItem(itemIdx, _name, _cost, _cnt, _supplier);
+    }
+    
+    /* removeItem
+     * removes item and sets storage space to inactive
+     * @arg itemidx   (uint32)  item's index in storage array
+     * @arg _name     (string)  name of item
+     * @arg _cost     (uint256) cost of item
+     * @arg _cnt      (uint32)  no. items in stock
+     * @arg _supplier (address) the hex address of the item's supplier
+     */ 
+    function removeItem(uint32 itemIdx) external {
+        if (msg.sender != stg[itemIdx].item.supplier && msg.sender != _creator) {
+            revert();
         }
-        // if failed to add to array
-        if(!success) {
-          // shit be fucked, u no add:: maybe resize array
-          // TODO: !!!! refund user !!!
-          revert();
+        stg[itemIdx].item.name = ""; 
+        stg[itemIdx].item.cost = 0;
+        stg[itemIdx].item.cnt = 0; 
+        stg[itemIdx].item.supplier = 0x0;
+        stg[itemIdx].item.idx = itemIdx;
+        stg[itemIdx].isActive = false;
+    }
+    
+    /* remove item and replace with new one 
+     * @arg itemidx   (uint32)  item's index in storage array
+     * @arg _name     (string)  name of item
+     * @arg _cost     (uint256) cost of item
+     * @arg _cnt      (uint32)  no. items in stock
+     * @arg _supplier (address) the hex address of the item's supplier
+     */
+    function removeitem(uint32 itemidx, string _name, uint256 _cost, uint32 _cnt, address _supplier) external {
+        if (msg.sender != stg[itemidx].item.supplier && msg.sender != _creator) {
+            revert();
         }
-      } 
-    }
-    // NOTE: For unlock, lock, and remove we take in a storeIdx as uint8,
-    //       but pass them items in use. 
-    function _unlock_store(uint32 storeIdx) internal {
-      // make api call to physical device
-      stg[storeIdx].locked = false;
-      // currently dysfunctional while store struct is dysfunctional. as is checks if item is locked. 
-    }
-    
-    function _lock_store(uint32 storeIdx) internal {
-      // make api call to physical device
-      stg[storeIdx].locked = true;
+        stg[itemidx].item.name = ""; 
+        stg[itemidx].item.cost = 0;
+        stg[itemidx].item.cnt = 0; 
+        stg[itemidx].item.supplier = "0x0";
+        stg[itemidx].item.idx = itemidx;
+        additem(itemidx, _name, _cost, _cnt, _supplier);
+        // @todo test?
     }
     
-    function vend(Item _item, uint32 qty) external payable {
-      // TODO: unlock storage => vend qty item
-      // update item state
-      if (qty > _item.cnt) {
-        _unlock_store(this.find(_item));
-        // TODO: vend here
-        _item.cnt-=qty;
-        _lock_store(this.find(_item));
-      }
-      // handles removing item if item wont be restocked
-      needResupply(_item); 
+    /* vend
+     * vends item to customer 
+     * @arg idx (uint32) desired item's index in storage array
+     * @arg qty (uint32) number of items to vend
+     */
+    function vend(uint32 idx, uint32 qty) external payable {
+        if (stg[idx].item.cnt != 0) {
+            stg[idx].item.cnt -= qty;
+            if (stg[idx].item.cnt < 0) {
+              stg[idx].item.cnt += qty;
+              revert();
+            }
+        } else { 
+            revert(); 
+        }
+    }
+
+    // UTILITIES
+    /* quick fix to compare strings */
+    function stringsEqual(string _a, string _b) internal pure returns (bool) {
+      return keccak256(_a) == keccak256(_b);
     }
     
-    function needResupply(Item _item) internal {
-      if (_item.cnt == 0) {
-        resupply(_item);
-      } else if (_item.cnt == uint8(-1)) {
-        this.remove(_item); //sends an item, but remove() takes an storeIdx. 
-      }
-    }
-    
-    function find(Item _item) external returns (uint32)  {
-        for (uint32 i = 0; i < STORAGE_MAX; i++) {
-            if (stringsEqual(stg[i].item.name, _item.name)) {
-                 return i;
+    /* convert bytes32 to string */
+    function bytes32ToString(bytes32 x) internal pure returns (string a) {
+        bytes memory bytesString = new bytes(32);
+        uint charCount = 0;
+        for (uint j = 0; j < 32; j++) {
+            byte char = byte(bytes32(uint(x) * 2 ** (8 * j)));
+            if (char != 0) {
+                bytesString[charCount] = char;
+                charCount++;
             }
         }
+        bytes memory bytesStringTrimmed = new bytes(charCount);
+        for (j = 0; j < charCount; j++) {
+            bytesStringTrimmed[j] = bytesString[j];
+        }
+        return string(bytesStringTrimmed);
     }
-    
-    function remove(Item _item) external {
-        _remove(this.find(_item));
-    }
-    
-    function _remove(uint32 storeIdx) internal { 
-      //probably should take item, and find its storeIdx
-      require(msg.sender == _creator);
-      delete stg[storeIdx];
-      // _inv.activeItems[storeIdx] = false;
-      _stgIdx--;
-    }
-    
-    function resupply(Item _item) internal {
-      // TODO: call external resupply contract for item (at _item.resupply) 
-      //_item.resupply(_item.supplier); //<< Do that  <<
-    }
-    
+
+    /* turn off machine */
     function turnOff() external {
       require(msg.sender == _creator);
       _running = false;
     }
-    // UTILITIES
-    function stringsEqual(string _a, string _b) internal returns (bool) {
-      return keccak256(_a) == keccak256(_b);
-  }
+
+    // function find(Item _item) internal view returns (uint16)  {
+    //     for (uint16 i = 0; i < STORAGE_MAX; i++) {
+    //         if (stringsEqual(stg[i].item.name, _item.name)) {
+    //              return i;
+    //         }
+    //     }
+    // }
+    
+    
+    // function needResupply(Item _item) internal {
+    //   if (_item.cnt == 0) {
+    //     resupply(_item);
+    //   } else if (_item.cnt == uint8(-1)) {
+    //     this.remove(_item); //sends an item, but remove() takes an storeIdx. 
+    //   }
+    // }
+    
+    // function resupply(Item _item) internal {
+    //   // TODO: call external resupply contract for item (at _item.resupply) 
+    //   //_item.resupply(_item.supplier); //<< Do that  <<
+    // }
+    
 }
 
-// TODO: move into own file
-//       populate the vending machine
-/* contract vendMeUpFam {
-  function popDefaultVendingMachine() {
-    // TODO:
-  }
-} */
-// NOTES:
-// stock vending machine
-// connect vending machine to ethereum network
