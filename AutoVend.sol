@@ -66,7 +66,9 @@ contract AutoVend {
     }
     
     /* get Item 
-     * @NOTE: does not work currently because can't return array of structs
+     * 
+     * @NOTE: 
+     * does not work currently because can't return array of structs
     function getItem(uint32 itemIdx) external view returns (Item) {
         return stg[itemIdx].item;
     } */
@@ -103,7 +105,11 @@ contract AutoVend {
      * @arg _cnt      (uint32)  no. items in stock
      * @arg _supplier (address) the hex address of the item's supplier
      */
-    function removeItem(uint32 itemIdx, string _name, uint256 _cost, uint32 _cnt, address _supplier) external {
+    function removeItem(uint32  itemIdx,
+                        string  _name,
+                        uint256 _cost,
+                        uint32  _cnt,
+                        address _supplier) external {
         if (msg.sender != stg[itemIdx].item.supplier && msg.sender != _creator) {
             revert();
         }
