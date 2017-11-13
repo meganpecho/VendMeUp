@@ -47,14 +47,29 @@ contract AutoVend {
     
     /* addItem */
     function addItem(uint32 _idx, string _name, uint256 _cost, uint32 _cnt, address _supplier) public {
-        Item memory tmp = Item({name: _name, cost: _cost, cnt: _cnt, supplier: _supplier, idx: _idx});
+        while(stg[_idx].isActive && _idx < STORAGE_MAX) {
+            _idx++;
+        }
+        if (_idx >= STORAGE_MAX) {
+            /* @todo REVERT */
+            
+        }
+        Item memory tmp = Item({name:     _name,
+                                cost:     _cost,
+                                cnt:      _cnt,
+                                supplier: _supplier,
+                                idx:      _idx});
         stg[_idx].item = tmp;
+        stg[_idx].isActive = true;
+        /* @todo change so that things are much more readable?*/
+        _stgIdx = _idx;
     }
     
-    /* get Item */
+    /* get Item 
+     * @NOTE: does not work currently because can't return array of structs
     function getItem(uint32 itemIdx) external view returns (Item) {
         return stg[itemIdx].item;
-    }
+    } */
     
     /* change Item */
     function changeItem(uint32 itemIdx, string _name, uint256 _cost, uint32 _cnt, address _supplier) external {
@@ -75,32 +90,28 @@ contract AutoVend {
         if (msg.sender != stg[itemIdx].item.supplier && msg.sender != _creator) {
             revert();
         }
-        stg[itemIdx].item.name = ""; 
-        stg[itemIdx].item.cost = 0;
-        stg[itemIdx].item.cnt = 0; 
-        stg[itemIdx].item.supplier = 0x0;
+        stg[itemIdx].item.name = ""; stg[itemIdx].item.cost = 0;
+        stg[itemIdx].item.cnt = 0; stg[itemIdx].item.supplier = 0x0;
         stg[itemIdx].item.idx = itemIdx;
         stg[itemIdx].isActive = false;
     }
     
-    /* remove item and replace with new one 
+     /* remove item and replace with new one 
      * @arg itemidx   (uint32)  item's index in storage array
      * @arg _name     (string)  name of item
      * @arg _cost     (uint256) cost of item
      * @arg _cnt      (uint32)  no. items in stock
      * @arg _supplier (address) the hex address of the item's supplier
      */
-    function removeitem(uint32 itemidx, string _name, uint256 _cost, uint32 _cnt, address _supplier) external {
-        if (msg.sender != stg[itemidx].item.supplier && msg.sender != _creator) {
+    function removeItem(uint32 itemIdx, string _name, uint256 _cost, uint32 _cnt, address _supplier) external {
+        if (msg.sender != stg[itemIdx].item.supplier && msg.sender != _creator) {
             revert();
         }
-        stg[itemidx].item.name = ""; 
-        stg[itemidx].item.cost = 0;
-        stg[itemidx].item.cnt = 0; 
-        stg[itemidx].item.supplier = "0x0";
-        stg[itemidx].item.idx = itemidx;
-        additem(itemidx, _name, _cost, _cnt, _supplier);
-        // @todo test?
+        stg[itemIdx].item.name = ""; stg[itemIdx].item.cost = 0;
+        stg[itemIdx].item.cnt = 0; stg[itemIdx].item.supplier = 0x0;
+        stg[itemIdx].item.idx = itemIdx;
+        addItem(itemIdx, _name, _cost, _cnt, _supplier);
+        // @TODO test?
     }
     
     /* vend
@@ -108,16 +119,19 @@ contract AutoVend {
      * @arg idx (uint32) desired item's index in storage array
      * @arg qty (uint32) number of items to vend
      */
-    function vend(uint32 idx, uint32 qty) external payable {
+    function vend(uint32 idx, uint32 qty) external payable returns (bool) {
+        require(stg[idx].isActive);
         if (stg[idx].item.cnt != 0) {
             stg[idx].item.cnt -= qty;
-            if (stg[idx].item.cnt < 0) {
-              stg[idx].item.cnt += qty;
-              revert();
-            }
-        } else { 
-            revert(); 
+            // @TODO vend/interact with the storage location?
+        } else { // @TODO need to give refund to the 
+            revert(); // call for resupply?
         }
+    }
+    
+    function turnOff() external {
+      require(msg.sender == _creator);
+      _running = false;
     }
 
     // UTILITIES
@@ -143,13 +157,9 @@ contract AutoVend {
         }
         return string(bytesStringTrimmed);
     }
-
-    /* turn off machine */
-    function turnOff() external {
-      require(msg.sender == _creator);
-      _running = false;
-    }
-
+}
+// NOTES:
+    /* Auxiliary Fxns that currently have no use */
     // function find(Item _item) internal view returns (uint16)  {
     //     for (uint16 i = 0; i < STORAGE_MAX; i++) {
     //         if (stringsEqual(stg[i].item.name, _item.name)) {
@@ -172,5 +182,3 @@ contract AutoVend {
     //   //_item.resupply(_item.supplier); //<< Do that  <<
     // }
     
-}
-
