@@ -31,16 +31,23 @@ contract AutoVend {
     store[6] private stg; /* array of storage structs to contain items */
 
     //Checks if the machine is on, and the item is active
-    modifier isVendOk(uint32 idx) {
+    modifier isVendOk(uint32 idx, uint32 qty) {
         require(_running);
         require(stg[idx].isActive);
+        require(stg[idx].item.cnt > 0);
+        require(stg[idx].item.cnt >= qty);
         _;
     }
 
     //Checks if machine is on
-    modifier on() {
-        require(!_running);
+    modifier isOn() {
+        require(_running);
         _;
+    }
+
+    modifier onlyBy(address _accnt) {
+      require(msg.sender == _accnt);
+      _;
     }
 
 
@@ -54,6 +61,9 @@ contract AutoVend {
         _testMode = testMode;
         _stgIdx   = 0;
         _running  = true;
+        for (uint8 i = 0; i < STORAGE_MAX; i++) {
+          stg[i].isActive = false;
+        }
     }
 
     /* addItem
@@ -63,7 +73,12 @@ contract AutoVend {
      * @arg uint32  _cnt:      the number of items
      * @arg address _supplier: the supplier of the item
      */
-    function addItem(uint32 _idx, string _name, uint256 _cost, uint32 _cnt, address _supplier) on public {
+    function addItem(uint32 _idx,
+                     string _name,
+                     uint256 _cost,
+                     uint32 _cnt,
+                     address _supplier) isOn onlyBy(_creator) public {
+        
         Item memory tmp = Item({name:     _name,
                                 cost:     _cost,
                                 cnt:      _cnt,
@@ -87,7 +102,7 @@ contract AutoVend {
      * @arg uint32  _cnt:      the number of items
      * @arg address _supplier: the supplier of the item
      */
-    function changeItem(uint32 itemIdx, string _name, uint256 _cost, uint32 _cnt, address _supplier) on external {
+    function changeItem(uint32 itemIdx, string _name, uint256 _cost, uint32 _cnt, address _supplier) isOn external {
         require(msg.sender == stg[itemIdx].item.supplier);
         // @note: sanity check to ensure old item's information doesn't bleed over
         stg[itemIdx].item.name     = "";
@@ -106,7 +121,7 @@ contract AutoVend {
      * @arg _cnt      (uint32)  no. items in stock
      * @arg _supplier (address) the hex address of the item's supplier
      */
-    function removeItem(uint32 itemIdx) on external {
+    function removeItem(uint32 itemIdx) isOn external {
         if (msg.sender != stg[itemIdx].item.supplier && msg.sender != _creator){
             revert();
         }
@@ -155,8 +170,11 @@ contract AutoVend {
      * @arg idx (uint32) desired item's index in storage array
      * @arg qty (uint32) number of items to vend
      */
-    function vend(uint32 idx, uint32 qty) external isVendOk(idx) payable returns (bool) {
-        uint256 tot_val = uint256(qty) * stg[idx].item.cost;
+    function vend(uint32 idx, uint32 qty) external isOn isVendOk(idx, qty) payable returns (bool) {
+        uint256 tot_val = checkMulOverflow(stg[idx].item.cost, uint(qty));
+        if (tot_val == 0) {
+            revert();
+        }
         require(msg.value >= tot_val);
         /* @todo: percentage for contract creator? */
         if (stg[idx].item.cnt >= qty) {
@@ -166,6 +184,9 @@ contract AutoVend {
             //make sure JS doesn't do same check as above on cnt, cnt has already been subtracted from.
         } else {
             revert(); // call for resupply?
+        }
+        if (stg[idx].item.cnt <= 0) {
+            stg[idx].isActive = false;
         }
     }
 
@@ -183,6 +204,31 @@ contract AutoVend {
 
     /* ------------------------------UTILITIES------------------------------ */
 
+    /* checkAddOverflow
+     * checks if integer addition between two 
+     */
+    function checkAddOverflow(uint a, uint b) internal pure returns (uint) {
+      if (a + b < a) {
+        if (a >= b) {
+          return a;
+        } else {
+          return b;
+        }
+      } else {
+        return a + b;
+      }
+    }
+
+    function checkMulOverflow(uint a, uint b) internal pure returns (uint) {
+      uint256 UINT256_MAX = uint256(int256(-1));
+      uint256 result = a * b;
+      if (result > UINT256_MAX) {
+        return 0;
+      } else {
+        return result & UINT256_MAX;
+      }
+
+    }
     /* stringsEqual
      * @TODO: find better way?
      * hashes both strings and returns their thing
